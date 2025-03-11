@@ -1,0 +1,6 @@
+boto3
+coverage
+inotify_simple
+nose2
+moto
+unittest-xml-reporting

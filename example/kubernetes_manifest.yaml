@@ -1,0 +1,91 @@
+# This manifest is only an example and will not contain updated tags.
+# See git branch tags for the current version.
+# Manifest will be updated if there are any required changes.
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: core-dump
+  labels:
+    name: core-dump
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: core-dump-handler
+  namespace: core-dump
+  labels:
+    app.kubernetes.io/name: core-dump-handler
+  annotations:
+    eks.amazonaws.com/role-arn: <arn to the desired role>
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: core-dump-handler
+  namespace: core-dump
+spec:
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 10%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      name: core-dump-handler
+  template:
+    metadata:
+      labels:
+        name: core-dump-handler
+    spec:
+      containers:
+        - name: core-dump-handler
+          image: <path to the image>
+          env:
+            - name: REGION
+              value: us-east-1
+            - name: BUCKET_NAME
+              value: my-s3-bucket
+            - name: LOGLEVEL
+              value: INFO
+          resources:
+            requests:
+              cpu: 250m
+              memory: 100Mi
+            limits:
+              memory: 100Mi
+          volumeMounts:
+            - mountPath: /core_dumps
+              name: core-dump-volume
+          startupProbe:
+            exec:
+              command:
+                - grep
+                - started
+                - /core_dump_handler/startupcheck
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          livenessProbe:
+            exec:
+              command:
+                - grep
+                - started
+                - /core_dump_handler/startupcheck
+            failureThreshold: 1
+            periodSeconds: 5
+          securityContext:
+            runAsUser: 0
+            privileged: true
+      volumes:
+        - name: core-dump-volume
+          hostPath:
+            path: /var/core_dumps
+            type: Directory
+      serviceAccountName: core-dump-handler
+      terminationGracePeriodSeconds: 10
