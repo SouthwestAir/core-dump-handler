@@ -63,7 +63,7 @@ six==1.16.0
     # via python-dateutil
 unittest-xml-reporting==3.2.0
     # via -r requirements.in
-urllib3==2.2.3
+urllib3==2.5.0
     # via
     #   botocore
     #   requests
