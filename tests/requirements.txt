@@ -27,7 +27,7 @@ idna==3.10
     # via requests
 inotify-simple==1.3.5
     # via -r requirements.in
-jinja2==3.1.4
+jinja2==3.1.6
     # via moto
 jmespath==1.0.1
     # via
