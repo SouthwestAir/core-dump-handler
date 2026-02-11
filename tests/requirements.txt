@@ -15,13 +15,13 @@ botocore==1.35.50
     #   s3transfer
 certifi==2024.8.30
     # via requests
-cffi==1.17.1
+cffi==2.0.0
     # via cryptography
 charset-normalizer==3.4.0
     # via requests
 coverage==7.6.4
     # via -r requirements.in
-cryptography==43.0.3
+cryptography==46.0.5
     # via moto
 idna==3.10
     # via requests
